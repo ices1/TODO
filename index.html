@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>TODO</title>
+    <style>
+    body{
+      background-color: #f5f5f5;
+      font: 16px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    * {
+      list-style: none;
+      box-sizing: border-box;
+    }
+    .main{
+      max-width: 800px;
+      padding: 200px auto;
+      margin: auto;
+      text-align: center;
+    }
+    .todos > *{
+      text-align: left;
+      display: inline-block;
+      margin: auto;
+      width: 550px;
+      background-color: #fff;
+      border: 1px #3333;
+    }
+    .inputCont{
+      position: relative;
+    }
+    .selectAll{
+      display: inline-block;
+      width: 25px;
+      height: 25px;
+      position:absolute;
+      top: 25px;
+      left: 10px;
+    }
+    #list{
+      line-height: 70px;
+      padding: 0;
+      margin: 0;
+      box-shadow: 0 -1px 3px 1px #3333; 
+    }
+    #list .delete{
+      visibility: hidden;
+      position: absolute;
+      right: 20px;
+      line-height: 70px;
+      color: red;
+      font-weight:bolder;
+      font-size: 1.2rem;
+    }
+    #list li:hover .delete{
+      visibility: inherit;
+    }
+    #list label{
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      border: 2px solid #3333;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    
+
+    #list label input, .selectAll input{
+      display: none;
+    }
+    #list li{
+      display: block;
+      position: relative;
+      padding-left: 10px;
+    }
+    #userInput {
+      padding-left: 50px;
+      width: 100%;
+    }
+    #userInput, #list li{
+      height: 70px;
+      border: 1px #3333;
+      box-shadow: 0 -1px 1px #3333; 
+    }
+    .menu{
+      padding-left: 10px;
+      height: 40px;
+      border: 1px #333;
+      /* box-shadow: 0 -1px 1px #3333;  */
+    }
+    
+    .itemCompleted{
+      color: #999;
+    }
+    .itemCompleted .content{
+      text-decoration: line-through;
+    }
+    .itemCompleted label::after, .selectAll::after {
+      content:'V';
+      position: relative;
+      color: rgb(39, 166, 224);
+      vertical-align: top;
+      font-weight: bolder;
+      left: 5px;
+      line-height: 20px;
+    }
+    .selectAll::after{
+      color: #999;
+    }
+    .allCompleted::after{
+      color: rgb(25, 150, 252);
+      text-decoration: underline
+    }
+    #list p{
+      padding: 10px;
+      display: inline;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- demo 主体 -->
+  <div class="main">
+    <h1>Todo List</h1>
+    <!-- todo list 容器 -->
+    <div class="todos">
+      <div class="inputCont">
+        <label class="selectAll"><input class = 'selectAllInner' type="checkbox"> </label>
+        <input id="userInput" type="text" placeholder="what needs to be dones?">
+      </div>
+      <!-- list 部分 -->
+      <ul id="list">
+        <!-- <li> 
+          <label> <input type="checkbox"> </label> 
+          <p class="content">test1</p>
+          <span class="delete"> X </span>
+        </li>
+        <li> 
+          <label> <input type="checkbox"> </label> 
+          <p class="content">test1</p>
+          <span class="delete"> X </span>
+        </li> -->
+      </ul>
+      <!-- menu 部分 -->
+      <div class="menu">
+        <span class="itemsLeft"> 0 </span> <span> items left</span>
+        <button class="showAll">All</button>
+        <button class="showActive">Active</button>
+        <button class="showCompleted">Completed</button>
+      </div>
+    </div>
+  </div>
+  <script src="./main.js"></script>
+</body>
+</html>
