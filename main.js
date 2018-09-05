@@ -35,7 +35,7 @@ document.querySelector('.todos').addEventListener('click', event => {
       '\nclick at: targetName: ' + targetName )
 
   switch (targetClass) {
-    case 'selectAllInner': 
+    case 'selectAllInner':
       selectAll()
       break
     case 'item':
@@ -64,18 +64,18 @@ document.querySelector('.todos').addEventListener('click', event => {
   // }
 })
 
-// 监听 selectAll 点击
-document.querySelector('.selectAll input').addEventListener('click', event => {
-  // debugger
-  selectAll()
-})
+// // 监听 selectAll 点击
+// document.querySelector('.selectAll input').addEventListener('click', event => {
+//   // debugger
+//   selectAll()
+// })
 
-// 监听 selectAll 点击
-document.querySelector('.todos').addEventListener('click', event => {
-  // debugger
-  console.log(event.target.className)
-  console.log(event.target.id)
-})
+// // 监听 selectAll 点击
+// document.querySelector('.todos').addEventListener('click', event => {
+//   // debugger
+//   console.log(event.target.className)
+//   console.log(event.target.id)
+// })
 
 
 
@@ -208,6 +208,7 @@ function itemsFilter(status, f) {
 // 全选
 // allCompleted
 function selectAll(){
+  // debugger
   let status = allItemsStatus().every(x => x)
   let items = itemsFilter('all')
 
