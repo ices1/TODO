@@ -1,10 +1,96 @@
 let unCompletedCount = 0
+let store = localStorage
+let aryStore = JSON.parse(store['TODO'] || '[]')
+
+
+let winCompleted = false
+let winActive = false
+/*
+ "[
+  {"id":1,"title":"fdsaf","completed":false},
+  {"id":2,"title":"fsdf","completed":false}
+]"
+ */
+
+// 增加到store
+function add2store(val) {
+
+  aryStore.push({
+    id: list.childElementCount - 1,
+    title: val,
+    completed: false
+  })
+  saveStore()
+}
+
+// 改变 store 内 item 状态
+function changeSts2Store(el, all = false, completed) {
+  if (all) {
+    aryStore.forEach(x => x['completed'] = completed)
+  } else {
+    let idx = [].indexOf.call(el.parentNode.children, el)
+    aryStore[idx]['completed'] = aryStore[idx]['completed'] ? false : true
+  }
+  
+  saveStore()
+}
+
+// 改变 store 内 item title
+function changeVal2Store(el,val) {
+  let idx = [].indexOf.call(el.parentNode.children, el)
+  aryStore[idx]['title'] = val
+
+  saveStore()
+}
+
+// 删除 store 内 item
+function deleteItem2Stroe(el) {
+  let idx = [].indexOf.call(el.parentNode.children, el)
+  aryStore.splice(idx,1)
+  aryStore.forEach((x, i) => {
+    if (i >= idx) {
+      --aryStore[i]['id']
+    }
+  })
+
+  saveStore()
+}
+
+// 序列化保存到store
+function saveStore() {
+  store['TODO'] = JSON.stringify(aryStore)
+}
+
+// 初始化
+window.onload = function() {
+  // let aryStore = JSON.parse(store['todos'])
+
+  // 初始化dom
+  aryStore.forEach(x => {
+    addItems(x['title']) 
+    if (x['completed']) {
+      let item = list.lastChild
+      item.className = 'itemCompleted'
+      item.children[0].children[0].checked = true
+    }
+  })
+
+  // 初始化计数
+  refreshCount()
+  // 初始化 全选样式
+  allSelectStyle()
+}
+
+
+
 
 // 监听 input 输入
 userInput.addEventListener('keypress', event => {
   if(event.keyCode == 13) {
     // 增加 list
     addItems(userInput.value)
+    // 写入 store
+    add2store(userInput.value)
     // 刷新计算
     refreshCount('add')
     console.log('well done! ',userInput.value)
@@ -39,9 +125,11 @@ document.querySelector('.todos').addEventListener('click', event => {
       selectAll()
       break
     case 'item':
+      changeSts2Store(event.target.parentNode.parentNode)
       changeItemStatus(event.target)
       break
     case 'delete':
+      deleteItem2Stroe(event.target.parentNode.parentNode)
       deleteItem(event.target)
       break
     case 'showAll':
@@ -125,7 +213,12 @@ function changeItemStatus(elNode) {
   item = elNode.parentElement.parentElement
   item.className = elNode.checked ? 'itemCompleted' : ''
 
-  allSelectStatus = allItemsStatus().every(x => x)
+  allSelectStyle()
+}
+
+function allSelectStyle() {
+  let allSelectStatus = allItemsStatus().every(x => x)
+
   if (allSelectStatus) {
     document.querySelector('.selectAll').classList.add('allCompleted')
   } else {
@@ -216,12 +309,20 @@ function selectAll(){
     items.forEach(x => x.className = '')
     document.querySelectorAll('li input').forEach(x => x.checked = false)
     refreshCount()
+    changeSts2Store('', true, false)
     document.querySelector('.selectAll').classList.remove('allCompleted')
   } else {
     items.forEach(x => x.className = 'itemCompleted')
     document.querySelectorAll('li input').forEach(x => x.checked = true)
     refreshCount('rmAll')
+    changeSts2Store('', true, true)
     document.querySelector('.selectAll').classList.add('allCompleted')
+  }
+debugger
+  if (winActive) {
+    showActive()
+  } else if (winCompleted) {
+    showCompleted()
   }
 }
 
@@ -241,19 +342,24 @@ function showItems(item, idx, turn) {
 
 // 进行中的 items
 function showActive(){
-
+  winActive = true
+  winCompleted = false
   itemsFilter('active', showItems)
 }
 
 // 完成的 items
 function showCompleted(){
-
+  winActive = true
+  winCompleted = false
   itemsFilter('completed', showItems)
 }
 
 // 全部的 items
 function showAll(){
   let items
+
+  winActive = false
+  winCompleted = false
 
   items = itemsFilter('all')
   items.forEach(x => x.style.display = 'block')
