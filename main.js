@@ -69,6 +69,8 @@ let onloadNow  = function() {debugger
   refreshCount()
   // 初始化 全选样式
   allSelectStyle()
+  // 初始化 clearCompleted样式
+  showClearCompleted()
 }()
 
 
@@ -110,17 +112,20 @@ document.querySelector('.todos').addEventListener('click', event => {
     case 'selectAllInner':
       selectAll()
       routeHash()
+      showClearCompleted()
       break
     case 'item':
       changeSts2Store(event.target.parentNode.parentNode)
       changeItemStatus(event.target)
       allSelectStyle()
       routeHash()
+      showClearCompleted()
       break
     case 'delete':
       deleteItem2Stroe(event.target.parentNode)
       deleteItem(event.target)
       allSelectStyle()
+      showClearCompleted()
       break
     case 'showAll':
       showAll()
@@ -130,6 +135,9 @@ document.querySelector('.todos').addEventListener('click', event => {
       break
     case 'showCompleted':
       showCompleted()
+      break
+    case 'clearCompleted':
+      clearCompleted()
       break
   }
 
@@ -342,7 +350,17 @@ function showItems(item, idx, turn) {
     item.style.display = 'block'
   }
 }
+// clearCompleted 显示样式
+function showClearCompleted() {
+  debugger
+  let coms = document.querySelectorAll('.itemCompleted')
 
+  if (coms.length == 0) {
+    document.querySelector('.clearCompleted').style.display = 'none'
+  } else {
+    document.querySelector('.clearCompleted').style.display = 'inline-block'
+  }
+}
 // 进行中的 items
 function showActive(){
   window.location.hash = 'Active'
@@ -363,4 +381,27 @@ function showAll(){
   items = itemsFilter('all')
   items.forEach(x => x.style.display = 'block')
 }
+
+// 清除完成 items
+function clearCompleted() {
+  let items = document.querySelectorAll('.itemCompleted')
+  debugger
+  items.forEach(el => {
+    deleteItem2Stroe(el)
+    deleteItem(el.children[0])
+    allSelectStyle()
+  })
+
+  document.querySelector('.clearCompleted').style.display = 'none'
+}
+
+
+
+
+
+
+
+
+
+
 
