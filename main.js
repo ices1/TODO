@@ -200,8 +200,7 @@ function t(parts, ...interpolations) {
 // 写入到 list
 function addItems(value) {
   let item = t`
-    <label> <input class='item' type="checkbox"> </label> 
-    <p class="content">${value}</p>
+    <label><input class='item' type="checkbox"></label><p class="content">${value}</p>
     <span class="delete"> X </span>
   `
 
