@@ -1,16 +1,5 @@
-let unCompletedCount = 0
 let store = localStorage
 let aryStore = JSON.parse(store['TODO'] || '[]')
-
-
-let winCompleted = false
-let winActive = false
-/*
- "[
-  {"id":1,"title":"fdsaf","completed":false},
-  {"id":2,"title":"fsdf","completed":false}
-]"
- */
 
 // 增加到store
 function add2store(val) {
@@ -20,6 +9,7 @@ function add2store(val) {
     title: val,
     completed: false
   })
+
   saveStore()
 }
 
@@ -35,7 +25,7 @@ function changeSts2Store(el, all = false, completed) {
   saveStore()
 }
 
-// 改变 store 内 item title
+// 改变 store 内 item value
 function changeVal2Store(el,val) {
   let idx = [].indexOf.call(el.parentNode.children, el)
   aryStore[idx]['title'] = val
@@ -62,7 +52,7 @@ function saveStore() {
 }
 
 // 初始化
-window.onload = function() {
+let onloadNow  = function() {debugger
   // let aryStore = JSON.parse(store['todos'])
 
   // 初始化dom
@@ -79,36 +69,32 @@ window.onload = function() {
   refreshCount()
   // 初始化 全选样式
   allSelectStyle()
-}
+}()
+
 
 
 
 
 // 监听 input 输入
 userInput.addEventListener('keypress', event => {
+  let val = userInput.value.trim()
+
   if(event.keyCode == 13) {
+    if(val == '') return
     // 增加 list
-    addItems(userInput.value)
+    addItems(val)
     // 写入 store
-    add2store(userInput.value)
+    add2store(val)
     // 刷新计算
     refreshCount('add')
-    console.log('well done! ',userInput.value)
+    console.log('---'+userInput.value+'-----')
+    //刷新全选样式
+    allSelectStyle()
+    //清空 输入栏
+    console.log('well done, userInput: ', val)
     userInput.value = ''
   }
 })
-
-// // 监听 list 点击
-// list.addEventListener('click', event => {
-//   // debugger
-//   let targetName = event.target.nodeName
-//   console.log('click at: ' + targetName)
-//   if (targetName == 'INPUT') {
-//     changeItemStatus(event.target)
-//   } else if (targetName == 'SPAN') {
-//     deleteItem(event.target)
-//   }
-// })
 
 // 监听 todos 点击
 document.querySelector('.todos').addEventListener('click', event => {
@@ -123,14 +109,18 @@ document.querySelector('.todos').addEventListener('click', event => {
   switch (targetClass) {
     case 'selectAllInner':
       selectAll()
+      routeHash()
       break
     case 'item':
       changeSts2Store(event.target.parentNode.parentNode)
       changeItemStatus(event.target)
+      allSelectStyle()
+      routeHash()
       break
     case 'delete':
-      deleteItem2Stroe(event.target.parentNode.parentNode)
+      deleteItem2Stroe(event.target.parentNode)
       deleteItem(event.target)
+      allSelectStyle()
       break
     case 'showAll':
       showAll()
@@ -143,32 +133,49 @@ document.querySelector('.todos').addEventListener('click', event => {
       break
   }
 
-  // if (targetClass == 'selectAllInner') {
-  //   selectAll()
-  // } else if (targetClass == 'item') {
-  //   changeItemStatus(event.target)
-  // } else if (targetClass == 'delete') {
-  //   deleteItem(event.target)
-  // }
 })
 
-// // 监听 selectAll 点击
-// document.querySelector('.selectAll input').addEventListener('click', event => {
-//   // debugger
-//   selectAll()
-// })
+// 监听 selectAll 点击
+list.addEventListener('dblclick', event => {
+  let item = event.target
+  if (item.nodeName == 'LABEL') return
+  if (item.nodeName == 'P') item = item.parentElement
+  // debugger
+  let changeText = document.createElement('input')
+  changeText.value = item.children[1].innerText
+  changeText.className = 'changeText'
+  item.appendChild(changeText)
 
-// // 监听 selectAll 点击
-// document.querySelector('.todos').addEventListener('click', event => {
-//   // debugger
-//   console.log(event.target.className)
-//   console.log(event.target.id)
-// })
+  let inputText = document.querySelector('.changeText')
+  inputText.focus()
+  // 监听 输入值
+  listenChangeInput(inputText,item.children[1])
+})
 
+// 监听 双击后 输入事件
+function listenChangeInput(el, goal) {
 
+  function helper() {
+    let val = el.value.trim()
+    if(val == '') return
 
+    goal.innerText = val
+    el.parentElement.removeChild(el)
+    // 存入 store
+    changeVal2Store(goal.parentNode, val)
+  }
+  // 失去焦点
+  el.addEventListener('blur', helper)
 
+  // 回车
+  el.addEventListener('keypress', () => {
+    if (event.keyCode == 13) {
+      el.removeEventListener('blur',helper)
+      helper()
+    }
+  })
 
+}
 
 // 动态生成 html  
 function t(parts, ...interpolations) {
@@ -189,9 +196,11 @@ function addItems(value) {
     <p class="content">${value}</p>
     <span class="delete"> X </span>
   `
-  // let li = document.createElement('li')
-  // li.innerText = value
 
+  if (routeHash()) {
+    item.style.display = 'none'
+  }
+debugger
   list.appendChild(item)
 }
 
@@ -212,56 +221,54 @@ function changeItemStatus(elNode) {
   console.log('checked: ', status)
   item = elNode.parentElement.parentElement
   item.className = elNode.checked ? 'itemCompleted' : ''
-
-  allSelectStyle()
 }
 
-function allSelectStyle() {
-  let allSelectStatus = allItemsStatus().every(x => x)
+// 根据 hash 该校 item 显示状态 
+function routeHash() {
+  let path = window.location.hash
 
-  if (allSelectStatus) {
-    document.querySelector('.selectAll').classList.add('allCompleted')
-  } else {
-    document.querySelector('.selectAll').classList.remove('allCompleted')
+  if (path == '#All') {
+    showAll()
+  } else if (path == '#Active') {
+    showActive()
+  } else if (path == '#Completed') {
+    showCompleted()
   }
+
+  return path == '#Completed'
+}
+
+// 全选样式 
+function allSelectStyle() {
+  let itemsStatus = allItemsStatus()
+  let allSelectStatus = itemsStatus.every(x => x)
+  let allSelect =  document.querySelector('.selectAll')
+
+  if (itemsStatus.length == 0) {
+    allSelect.style.display = 'none';
+  } else {
+    allSelect.style.display = 'block';
+
+    if (allSelectStatus) {
+      document.querySelector('.selectAll').classList.add('allCompleted')
+    } else {
+      document.querySelector('.selectAll').classList.remove('allCompleted')
+    }
+
+  }
+
 }
 
 // 刷新总数
-refreshCount()
-
-// function refreshCount(oper) {
-// // debugger  
-// let count = 0
-
-//   if(oper == 'add') {
-//     count = ++unCompletedCount
-//   } else if (oper == 'rm') {
-//     count = --unCompletedCount
-//   } else if (oper == 'rmAll') {
-//     count = 0
-//   } else {
-//     let items = document.querySelectorAll('li input')
-//     if(items.length) {
-//       items.forEach(it => it.checked ? 0 : count++)
-//       unCompletedCount = count
-//     } else {
-//       unCompletedCount = count = 0
-//     }
-//   }
-
-//   document.querySelector('.itemsLeft').innerHTML = count
-// }
-
 function refreshCount(oper) {
 // debugger  
   let count = 0
-
   let items = document.querySelectorAll('li input')
+
   if(items.length) {
     items.forEach(it => it.checked ? 0 : count++)
-    unCompletedCount = count
   } else {
-    unCompletedCount = count = 0
+    count = 0
   }
 
   document.querySelector('.itemsLeft').innerHTML = count
@@ -318,12 +325,8 @@ function selectAll(){
     changeSts2Store('', true, true)
     document.querySelector('.selectAll').classList.add('allCompleted')
   }
-debugger
-  if (winActive) {
-    showActive()
-  } else if (winCompleted) {
-    showCompleted()
-  }
+// debugger
+
 }
 
 // 部分 显示 
@@ -342,24 +345,20 @@ function showItems(item, idx, turn) {
 
 // 进行中的 items
 function showActive(){
-  winActive = true
-  winCompleted = false
+  window.location.hash = 'Active'
   itemsFilter('active', showItems)
 }
 
 // 完成的 items
 function showCompleted(){
-  winActive = true
-  winCompleted = false
+  window.location.hash = 'Completed'
   itemsFilter('completed', showItems)
 }
 
 // 全部的 items
 function showAll(){
   let items
-
-  winActive = false
-  winCompleted = false
+  window.location.hash = 'All'
 
   items = itemsFilter('all')
   items.forEach(x => x.style.display = 'block')
