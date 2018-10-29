@@ -21,12 +21,12 @@ function changeSts2Store(el, all = false, completed) {
     let idx = [].indexOf.call(el.parentNode.children, el)
     aryStore[idx]['completed'] = aryStore[idx]['completed'] ? false : true
   }
-  
+
   saveStore()
 }
 
 // 改变 store 内 item value
-function changeVal2Store(el,val) {
+function changeVal2Store(el, val) {
   let idx = [].indexOf.call(el.parentNode.children, el)
   aryStore[idx]['title'] = val
 
@@ -36,7 +36,7 @@ function changeVal2Store(el,val) {
 // 删除 store 内 item
 function deleteItem2Stroe(el) {
   let idx = [].indexOf.call(el.parentNode.children, el)
-  aryStore.splice(idx,1)
+  aryStore.splice(idx, 1)
   aryStore.forEach((x, i) => {
     if (i >= idx) {
       --aryStore[i]['id']
@@ -52,12 +52,13 @@ function saveStore() {
 }
 
 // 初始化
-let onloadNow  = function() {debugger
+let onloadNow = function () {
+  debugger
   // let aryStore = JSON.parse(store['todos'])
 
   // 初始化dom
   aryStore.forEach(x => {
-    addItems(x['title']) 
+    addItems(x['title'])
     if (x['completed']) {
       let item = list.lastChild
       item.className = 'itemCompleted'
@@ -81,15 +82,15 @@ let onloadNow  = function() {debugger
 userInput.addEventListener('keypress', event => {
   let val = userInput.value.trim()
 
-  if(event.keyCode == 13) {
-    if(val == '') return
+  if (event.keyCode == 13) {
+    if (val == '') return
     // 增加 list
     addItems(val)
     // 写入 store
     add2store(val)
     // 刷新计算
     refreshCount('add')
-    console.log('---'+userInput.value+'-----')
+    console.log('---' + userInput.value + '-----')
     //刷新全选样式
     allSelectStyle()
     //清空 输入栏
@@ -104,9 +105,9 @@ document.querySelector('.todos').addEventListener('click', event => {
   let targetClass = event.target.className
   let targetId = event.target.id
   let targetName = event.target.nodeName
-  console.log('\nclick at: targetClass: ' + targetClass + 
-      '\nclick at: targetId: ' + targetId + 
-      '\nclick at: targetName: ' + targetName )
+  console.log('\nclick at: targetClass: ' + targetClass +
+    '\nclick at: targetId: ' + targetId +
+    '\nclick at: targetName: ' + targetName)
 
   switch (targetClass) {
     case 'selectAllInner':
@@ -157,7 +158,7 @@ list.addEventListener('dblclick', event => {
   let inputText = document.querySelector('.changeText')
   inputText.focus()
   // 监听 输入值
-  listenChangeInput(inputText,item.children[1])
+  listenChangeInput(inputText, item.children[1])
 })
 
 // 监听 双击后 输入事件
@@ -165,7 +166,7 @@ function listenChangeInput(el, goal) {
 
   function helper() {
     let val = el.value.trim()
-    if(val == '') return
+    if (val == '') return
 
     goal.innerText = val
     el.parentElement.removeChild(el)
@@ -178,7 +179,7 @@ function listenChangeInput(el, goal) {
   // 回车
   el.addEventListener('keypress', () => {
     if (event.keyCode == 13) {
-      el.removeEventListener('blur',helper)
+      el.removeEventListener('blur', helper)
       helper()
     }
   })
@@ -207,7 +208,7 @@ function addItems(value) {
   if (routeHash()) {
     item.style.display = 'none'
   }
-debugger
+  debugger
   list.appendChild(item)
 }
 
@@ -221,7 +222,7 @@ function deleteItem(elNode) {
 // 改变 item 状态
 function changeItemStatus(elNode) {
   let allSelectStatus
-  let status , item
+  let status, item
 
   status = elNode.checked ? 'rm' : 'add'
   refreshCount(status)
@@ -249,7 +250,7 @@ function routeHash() {
 function allSelectStyle() {
   let itemsStatus = allItemsStatus()
   let allSelectStatus = itemsStatus.every(x => x)
-  let allSelect =  document.querySelector('.selectAll')
+  let allSelect = document.querySelector('.selectAll')
 
   if (itemsStatus.length == 0) {
     allSelect.style.display = 'none';
@@ -268,11 +269,11 @@ function allSelectStyle() {
 
 // 刷新总数
 function refreshCount(oper) {
-// debugger  
+  // debugger  
   let count = 0
   let items = document.querySelectorAll('li input')
 
-  if(items.length) {
+  if (items.length) {
     items.forEach(it => it.checked ? 0 : count++)
   } else {
     count = 0
@@ -297,11 +298,11 @@ function itemsFilter(status, f) {
     let turn = false
 
     allItems.forEach((x, i) => f(x, i, turn))
-  } else if(status == 'completed') {
+  } else if (status == 'completed') {
     let turn = true
 
     allItems.forEach((x, i) => f(x, i, turn))
-  } else if (status == 'all'){
+  } else if (status == 'all') {
 
     return allItems
   }
@@ -314,12 +315,12 @@ function itemsFilter(status, f) {
 
 // 全选
 // allCompleted
-function selectAll(){
+function selectAll() {
   // debugger
   let status = allItemsStatus().every(x => x)
   let items = itemsFilter('all')
 
-  if(status) {
+  if (status) {
     items.forEach(x => x.className = '')
     document.querySelectorAll('li input').forEach(x => x.checked = false)
     refreshCount()
@@ -332,7 +333,7 @@ function selectAll(){
     changeSts2Store('', true, true)
     document.querySelector('.selectAll').classList.add('allCompleted')
   }
-// debugger
+  // debugger
 
 }
 
@@ -361,19 +362,19 @@ function showClearCompleted() {
   }
 }
 // 进行中的 items
-function showActive(){
+function showActive() {
   window.location.hash = 'Active'
   itemsFilter('active', showItems)
 }
 
 // 完成的 items
-function showCompleted(){
+function showCompleted() {
   window.location.hash = 'Completed'
   itemsFilter('completed', showItems)
 }
 
 // 全部的 items
-function showAll(){
+function showAll() {
   let items
   window.location.hash = 'All'
 
